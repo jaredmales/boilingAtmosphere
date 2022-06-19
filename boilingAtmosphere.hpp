@@ -395,7 +395,7 @@ void boilingAtmosphere<realT>::setupConfig( mx::app::appConfigurator & config )
    config.add("boilatm.directory","", "boilatm.directory",argType::Required, "boilatm", "directory", false, "string", "Directory for output files");
    config.add("boilatm.screenSz","", "boilatm.screenSz",argType::Required, "boilatm", "screenSz", false, "int", "Size of the phase screens [pix] (default: 1024)");
    config.add("boilatm.wavefrontSz","", "boilatm.wavefrontSz",argType::Required, "boilatm", "wavefrontSz", false, "int", "Size of the wavefront [pix] (<= screenSz) (default: 128)");
-   config.add("boilatm.frequency","", "boilatm.frequency",argType::Required, "boilatm", "wavefrontSz", false, "real", "The sampling frequency [Hz] (default: 1000 Hz)");
+   config.add("boilatm.frequency","", "boilatm.frequency",argType::Required, "boilatm", "frequency", false, "real", "The sampling frequency [Hz] (default: 1000 Hz)");
    config.add("boilatm.alpha1","", "boilatm.alpha1",argType::Required, "boilatm", "alpha1", false, "vector<real>", "The boiling AR coefficient.  Per layer, if one is specified it applies to all layers. (default: 0.99626)");
    config.add("boilatm.scale","", "boilatm.scale",argType::Required, "boilatm", "scale", false, "bool", "Whether or not to scale alpha. (default: true)");
    config.add("boilatm.pureFF","", "boilatm.pureFF",argType::Required, "boilatm", "pureFF", false, "bool", "If true, then no boiling is applied. (default: false)");

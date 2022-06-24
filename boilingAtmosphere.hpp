@@ -148,8 +148,6 @@ public:
 
    aoSystem<realT, vonKarmanSpectrum<realT>> * aosys( );
 
-   void fs( const realT & f );
-
    realT fs();
 
    void alpha1( const realT & alph1 );
@@ -286,13 +284,6 @@ aoSystem<realT, vonKarmanSpectrum<realT>> * boilingAtmosphere<realT>::aosys( )
    return m_aosys;
 }
 
-
-template<typename realT>
-void boilingAtmosphere<realT>::fs( const realT & f )
-{
-   m_fs = f;
-}
-
 template<typename realT>
 realT boilingAtmosphere<realT>::fs()
 {
@@ -370,6 +361,11 @@ iosT & boilingAtmosphere<realT>::dumpBoilingAtmosphere( iosT & ios)
    ios << "#    scrnSz = " << scrnSz() << '\n';
    ios << "#    wfSz = " << wfSz() << '\n';
    ios << "#    fs = " << fs() << '\n';
+   ios << "#    tau_1 = ";
+   for(size_t n=0; n < m_alpha1s.size()-1; ++n) ios << -0.001/log(m_alpha1s[n])<< ", ";
+   if(m_alpha1s.size() > 0) ios << -0.001/log(m_alpha1s[m_alpha1s.size()-1]);
+   ios << '\n';
+
    ios << "#    alpha = ";
    for(size_t n=0; n < m_alpha1s.size()-1; ++n) ios << m_alpha1s[n] << ", ";
    if(m_alpha1s.size() > 0) ios << m_alpha1s[m_alpha1s.size()-1];
@@ -395,8 +391,8 @@ void boilingAtmosphere<realT>::setupConfig( mx::app::appConfigurator & config )
    config.add("boilatm.directory","", "boilatm.directory",argType::Required, "boilatm", "directory", false, "string", "Directory for output files");
    config.add("boilatm.screenSz","", "boilatm.screenSz",argType::Required, "boilatm", "screenSz", false, "int", "Size of the phase screens [pix] (default: 1024)");
    config.add("boilatm.wavefrontSz","", "boilatm.wavefrontSz",argType::Required, "boilatm", "wavefrontSz", false, "int", "Size of the wavefront [pix] (<= screenSz) (default: 128)");
-   config.add("boilatm.frequency","", "boilatm.frequency",argType::Required, "boilatm", "frequency", false, "real", "The sampling frequency [Hz] (default: 1000 Hz)");
-   config.add("boilatm.alpha1","", "boilatm.alpha1",argType::Required, "boilatm", "alpha1", false, "vector<real>", "The boiling AR coefficient.  Per layer, if one is specified it applies to all layers. (default: 0.99626)");
+   config.add("boilatm.alpha1","", "boilatm.alpha1",argType::Required, "boilatm", "alpha1", false, "vector<real>", "The boiling AR coefficient.  Per layer, if one is specified it applies to all layers. Overrides tau1");
+   config.add("boilatm.tau1","", "boilatm.tau11",argType::Required, "boilatm", "tau1", false, "vector<real>", "The boiling timescale.  Per layer, if one is specified it applies to all layers. (default: 0.5)");
    config.add("boilatm.scale","", "boilatm.scale",argType::Required, "boilatm", "scale", false, "bool", "Whether or not to scale alpha. (default: true)");
    config.add("boilatm.pureFF","", "boilatm.pureFF",argType::Required, "boilatm", "pureFF", false, "bool", "If true, then no boiling is applied. (default: false)");
 
@@ -412,7 +408,23 @@ void boilingAtmosphere<realT>::loadConfig( mx::app::appConfigurator & config )
    config(m_dir, "boilatm.directory");
    config(m_scrnSz, "boilatm.screenSz");
    config(m_wfSz, "boilatm.wavefrontSz");
-   config(m_fs, "boilatm.frequency");
+
+   m_fs = 1.0/m_aosys->tauWFS();
+
+   std::vector<realT> t1;
+   config(t1, "boilatm.tau1");
+   if(t1.size() == 1)
+   {
+      alpha1(exp(-0.001/t1[0]));
+   }
+   else if(t1.size() > 1)
+   {
+      for(size_t n=0 ; n < t1.size(); ++n)
+      {
+         t1[n] = exp(-0.001/t1[n]);
+      }
+      alpha1s(t1);
+   }
 
    std::vector<realT> a1;
    config(a1,"boilatm.alpha1");

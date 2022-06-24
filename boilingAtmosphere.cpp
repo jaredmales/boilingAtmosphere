@@ -42,8 +42,8 @@ public:
       m_batm.scrnSz(1024);   
       m_batm.wfSz(384);
       m_batm.aosys()->lam_sci(0.8e-6);
-      m_batm.fs(1000);
-      std::vector<realT> alphas( m_batm.aosys()->atm.n_layers(), 0.99626);
+      
+      std::vector<realT> alphas( m_batm.aosys()->atm.n_layers(), 0.998002);
       m_batm.alpha1s(alphas);
 
    }

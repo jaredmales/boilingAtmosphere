@@ -56,7 +56,7 @@ int boilingAtmosphere<realT>::allocate()
    freq.resize(m_scrnSz, m_scrnSz);
    sigproc::frequencyGrid(freq, m_aosys->D()/m_wfSz, k_x, k_y);
 
-   ff.write("freq.fits", freq);
+   ff.write("data/freq.fits", freq);
    improc::eigenImage<realT> psd;
    psd.resize(m_scrnSz, m_scrnSz);
    
@@ -84,7 +84,7 @@ int boilingAtmosphere<realT>::allocate()
       {
          for(size_t jj=0; jj < m_scrnSz; ++jj)
          {
-            realT tpsd = beta * m_aosys->psd(m_aosys->atm, freq(ii,jj), m_aosys->lam_sci(), m_aosys->lam_wfs(), m_aosys->secZeta());
+            realT tpsd = beta * m_aosys->psd(m_aosys->atm, n, freq(ii,jj), m_aosys->lam_sci(), m_aosys->lam_wfs(), m_aosys->secZeta());
             
             psd(ii,jj) = sqrt(tpsd)/pow(m_scrnSz,2); //m_scrnSz^2 is for FFT norm.
                         
@@ -103,12 +103,13 @@ int boilingAtmosphere<realT>::allocate()
             else if(m_scaleAlpha)
             {
                alph = exp( -pow( freq(ii,jj), 2./3.)/ (m_fs*tau1));
+               
             }
             else
             {
                alph = m_alpha1s[n];
             }
-            
+
             windPhase(ii,jj) *= alph;
             
             if(!m_pureFF)
@@ -126,7 +127,7 @@ int boilingAtmosphere<realT>::allocate()
       {
          m_alphas1M[n].upload(alphas1M.data(), m_scrnSz*m_scrnSz);// = sqrt(1-pow(alphas[n],2));
       
-         ff.write("data/alphas_" + std::to_string(n) + ".fits", alphas1M);
+         ff.write("data/alphas1M_" + std::to_string(n) + ".fits", alphas1M);
       }
             
    }

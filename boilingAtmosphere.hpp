@@ -437,7 +437,6 @@ void boilingAtmosphere<realT>::loadConfig( mx::app::appConfigurator & config )
    config(m_scaleAlpha, "boilatm.scale");
    config(m_pureFF, "boilatm.pureFF");
 
-   m_aosys->psd.subPiston(false);
 }
 
 } //namespace analysis
